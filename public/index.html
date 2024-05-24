@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple ToDo App</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    input { margin-right: 10px; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+  <h1>ToDo List</h1>
+  <input type="text" id="new-todo" placeholder="Add a new todo">
+  <button onclick="addTodo()">Add</button>
+  <ul id="todo-list"></ul>
+
+  <script>
+    async function fetchTodos() {
+      const response = await fetch('http://localhost:3000/todos');
+      const todos = await response.json();
+      const todoList = document.getElementById('todo-list');
+      todoList.innerHTML = '';
+      todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.textContent = todo.text;
+        li.appendChild(createDeleteButton(todo.id));
+        todoList.appendChild(li);
+      });
+    }
+
+    function createDeleteButton(id) {
+      const button = document.createElement('button');
+      button.textContent = 'Delete';
+      button.onclick = async () => {
+        await fetch(`http://localhost:3000/todos/${id}`, { method: 'DELETE' });
+        fetchTodos();
+      };
+      return button;
+    }
+
+    async function addTodo() {
+      const newTodoInput = document.getElementById('new-todo');
+      const text = newTodoInput.value.trim();
+      if (text) {
+        await fetch('http://localhost:3000/todos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text })
+        });
+        newTodoInput.value = '';
+        fetchTodos();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchTodos);
+  </script>
+</body>
+</html>

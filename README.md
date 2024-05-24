@@ -1,1 +1,1 @@
-very simple todo app for practise that lets you store todos on the server
+very simple todo app for practice that lets you store todos on the server
